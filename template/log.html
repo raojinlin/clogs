@@ -1,0 +1,41 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>Logs of {{.Container}}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/a11y-dark.min.css" integrity="sha512-Vj6gPCk8EZlqnoveEyuGyYaWZ1+jyjMPg8g4shwyyNlRQl6d3L9At02ZHQr5K6s5duZl/+YKMnM3/8pDhoUphg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/accesslog.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        body {
+            background: #2b2b2b;
+            padding: 0;
+            margin: 0;
+            height: 100%;
+        }
+        pre {line-height: 1em;white-space: pre-wrap;}
+        pre code.hljs {
+            padding: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+<pre></pre>
+<script type="text/javascript">
+    function connect(c) {
+        const ws = new WebSocket('ws://' + window.location.host + '/api/container/logs/' + c);
+        ws.onmessage = e => {
+            const code = document.createElement('code')
+            code.classList.add("language-accesslog");
+            code.textContent = e.data
+            document.querySelector('pre').appendChild(code);
+            document.body.scrollTo(0, document.body.offsetHeight);
+            hljs.highlightElement(code);
+        };
+        ws.onclose = () => console.log('closed');
+        return ws;
+    }
+    connect("{{.Container}}?showStderr=true&showStdout=true&follow=true&tail={{.Tail}}&logFile={{.LogFile}}");
+</script>
+</body>
+</html>
