@@ -8,7 +8,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/raojinlin/container-go/docker"
+	"github.com/raojinlin/clogs/docker"
 	"io"
 	"net/http"
 	"time"
