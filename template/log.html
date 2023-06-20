@@ -23,17 +23,20 @@
 <pre></pre>
 <script type="text/javascript">
     function connect(c) {
-        const ws = new WebSocket('ws://' + window.location.host + '/api/container/logs/' + c);
-        ws.onmessage = e => {
+        const eventSourceUrl = '//' + window.location.host + '/api/container/logs/' + c;
+        const eventSource = new EventSource(eventSourceUrl);
+        eventSource.onmessage = e => {
             const code = document.createElement('code')
             code.classList.add("language-accesslog");
-            code.textContent = e.data
+            code.textContent = atob(e.data.replace(/^"|"$/g, ''));
             document.querySelector('pre').appendChild(code);
-            document.body.scrollTo(0, document.body.offsetHeight);
+            document.body.scrollTo(0, document.querySelector('pre').offsetHeight);
             hljs.highlightElement(code);
         };
-        ws.onclose = () => console.log('closed');
-        return ws;
+
+        eventSource.onerror = err => {
+            eventSource.close();
+        };
     }
     connect("{{.Container}}?showStderr=true&showStdout=true&follow=true&tail={{.Tail}}&logFile={{.LogFile}}");
 </script>

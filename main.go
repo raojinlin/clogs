@@ -9,7 +9,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/raojinlin/clogs/docker"
-	"io"
 	"net/http"
 	"time"
 )
@@ -33,6 +32,17 @@ func (ws *WsWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
+type SSEWriter struct {
+	ctx *gin.Context
+}
+
+func (s *SSEWriter) Write(p []byte) (n int, err error) {
+	n = len(p)
+	s.ctx.SSEvent("message", p)
+	s.ctx.Writer.Flush()
+	return
+}
+
 func main() {
 	var port = 8082
 	flag.IntVar(&port, "port", port, "Listen port")
@@ -46,14 +56,6 @@ func main() {
 				c.AbortWithStatus(400)
 				return
 			}
-
-			wsConn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
-			if err != nil {
-				c.AbortWithError(500, err)
-				return
-			}
-
-			defer wsConn.Close()
 
 			tail := c.Query("tail")
 			if tail == "" {
@@ -73,23 +75,15 @@ func main() {
 			logsOut, err := docker.Logs(container, logFile, logOptions)
 			if err != nil {
 				c.AbortWithStatus(500)
-				wsConn.Close()
 				return
 			}
 
-			go func(logsOut io.ReadCloser) {
-				for {
-					_, msg, err := wsConn.ReadMessage()
-					if err != nil {
-						wsConn.Close()
-						logsOut.Close()
-						return
-					}
-					fmt.Println("recv: ", msg, err)
-				}
-			}(logsOut)
-			wsWriter := &WsWriter{wsConn: wsConn}
-			stdcopy.StdCopy(wsWriter, wsWriter, logsOut)
+			sseWriter := &SSEWriter{ctx: c}
+			c.Header("content-type", "text/event-stream")
+			_, err = stdcopy.StdCopy(sseWriter, sseWriter, logsOut)
+			if err != nil {
+				logsOut.Close()
+			}
 		})
 	}
 
