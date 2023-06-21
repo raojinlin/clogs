@@ -1,11 +1,11 @@
 # clogs
-clogs (Container Logs) 是一个使用 Go 语言编写的小型开源项目，基于 Gin 框架。它为 Docker 容器提供 WebSocket 日志接口，并提供一个 Web 界面实时查看容器日志。
+clogs (Container Logs) 是一个使用 Go 语言编写的小型开源项目，基于 Gin 框架。它为 Docker 容器提供HTTP日志接口，并提供一个Web界面实时查看容器日志。
 
 
 ## 特性
-1. 为 Docker 容器提供 WebSocket 日志接口：clogs 使用 WebSocket 技术，允许用户以实时、高效的方式获取 Docker 容器的日志信息。
+1. 为 Docker 容器提供HTTP日志接口：clogs 使用 SSE(Server-Sent Event) 技术，允许用户以实时、高效的方式获取 Docker 容器的日志信息。
 2. 使用 highlight.js 支持语法高亮：项目集成了 highlight.js，使用户可以以更好的方式阅读和分析日志内容。
-3. 平台无关且易于集成：clogs 设计独立、平台无关，非常易于集成到现有系统中。无论您使用的是 Linux、Windows 还是其他操作系统，无论您使用的是 Docker、Kubernetes 还是其他容器平台，该项目都可以轻松与其配合使用。
+3. 平台无关且易于集成：clogs 设计独立、平台无关，非常易于集成到现有系统中。无论是 Linux、Windows 还是其他操作系统，无论是 Docker、Kubernetes 还是其他容器平台，该项目都可以轻松与其配合使用。
 4. 支持查看容器内的日志文件或容器运行日志：clogs 支持实时查看容器内的日志文件，也可以输出容器的运行日志。用户可以通过指定日志文件路径使用 tail 命令查看日志内容。
 5. 可以使用 Docker 运行，也可以独立运行：该项目既支持使用 Docker 运行，方便部署和管理，也可以选择在任何支持 Go 语言的环境中独立运行。
 
@@ -61,12 +61,18 @@ go run . -port=8082
 ```
 
 ## 接口
-提供两个接口，webui和websocket接口
+提供两个接口，webui和SSE接口
 
-### WebSocket 接口
+### SSE 接口
 
 #### GET /api/container/logs/:container
-通过 WebSocket 获取容器的日志信息。
+通过 SSE 获取容器的日志信息。接口返回的数据是Base64编码，使用双引号包裹起来的字符串，使用时需要将前后的双引号去除解码。
+响应数据流格式如下：
+
+```text
+event:message
+data:"MTAuMS4wLjEgLSAtIFsyMS9KdW4vMjAyMzowMDo1MjoxNyArMDAwMF0gIkdFVCAvIEhUVFAvMS4xIiAyMDAgNiAiIiAia3ViZS1wcm9iZS8xLjI1Igo="
+```
 
 请求参数
 - container (字符串): 容器的名称或者ID。
@@ -79,8 +85,25 @@ go run . -port=8082
 - follow (布尔值): 是否实时输出日志内容。
 
 以下是使用示例：
+1. 使用EventSource接口
+```javascript
+const eventSource = new EventSource('/api/container/logs/my-container?tail=100&logFile=app.log&showStderr=true&showStdout=true&follow=false');
+eventSource.onmessage = event => {
+    const decodeData = atob(event.data.replace(/^"|"$/g, ''))
+};
+```
+
+2. 使用curl
 ```shell
-GET /api/container/logs/my-container?tail=100&logFile=app.log&showStderr=true&showStdout=true&follow=false
+curl 'http://127.0.0.1:8082/api/container/logs/2a8b8d9c5c62?showStderr=true&showStdout=true&follow=true&tail=15&logFile=stdout' -i
+HTTP/1.1 200 OK
+Cache-Control: no-cache
+Content-Type: text/event-stream
+Date: Wed, 21 Jun 2023 00:53:55 GMT
+Transfer-Encoding: chunked
+
+event:message
+data:"MTAuMS4wLjEgLSAtIFsyMS9KdW4vMjAyMzowMDo1MjoxNyArMDAwMF0gIkdFVCAvIEhUVFAvMS4xIiAyMDAgNiAiIiAia3ViZS1wcm9iZS8xLjI1Igo="
 ```
 
 ### 浏览器页面
@@ -97,9 +120,27 @@ GET /api/container/logs/my-container?tail=100&logFile=app.log&showStderr=true&sh
 
 请在浏览器中访问上述 URL 来查看容器的实时日志内容。
 
+
 #### 截图
 ![logs.png](./screenhost/logs.png)
 
+## 使用nginx部署
+```
+location /logs {
+    proxy_pass http://172.17.0.4:8082/logs;
+}
+
+location /api/container {
+    proxy_pass http://172.17.0.4:8082/api/container;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
+    proxy_buffering off;
+    proxy_connect_timeout 1d;
+    proxy_send_timeout 1d;
+    proxy_read_timeout 1d;
+}
+```
 # 贡献
 如果您对 clogs 感兴趣并希望做出贡献，您可以执行以下步骤：
 
