@@ -59,6 +59,7 @@ func main() {
 
 			sseWriter := &SSEWriter{ctx: c}
 			c.Header("content-type", "text/event-stream")
+			c.Header("X-Accel-Buffering", "no")
 			_, err = stdcopy.StdCopy(sseWriter, sseWriter, logsOut)
 			if err != nil {
 				logsOut.Close()

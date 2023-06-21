@@ -120,9 +120,27 @@ data:"MTAuMS4wLjEgLSAtIFsyMS9KdW4vMjAyMzowMDo1MjoxNyArMDAwMF0gIkdFVCAvIEhUVFAvMS
 
 请在浏览器中访问上述 URL 来查看容器的实时日志内容。
 
+
 #### 截图
 ![logs.png](./screenhost/logs.png)
 
+## 使用nginx部署
+```
+location /logs {
+    proxy_pass http://172.17.0.4:8082/logs;
+}
+
+location /api/container {
+    proxy_pass http://172.17.0.4:8082/api/container;
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
+    proxy_buffering off;
+    proxy_connect_timeout 1d;
+    proxy_send_timeout 1d;
+    proxy_read_timeout 1d;
+}
+```
 # 贡献
 如果您对 clogs 感兴趣并希望做出贡献，您可以执行以下步骤：
 
