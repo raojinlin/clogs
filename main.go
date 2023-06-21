@@ -7,30 +7,9 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"github.com/raojinlin/clogs/docker"
-	"net/http"
 	"time"
 )
-
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-type WsWriter struct {
-	wsConn *websocket.Conn
-}
-
-func (ws *WsWriter) Write(p []byte) (n int, err error) {
-	err = ws.wsConn.WriteMessage(websocket.TextMessage, p)
-	if err != nil {
-		return 0, err
-	}
-
-	return len(p), nil
-}
 
 type SSEWriter struct {
 	ctx *gin.Context

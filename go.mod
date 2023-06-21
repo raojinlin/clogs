@@ -6,7 +6,6 @@ require (
 	github.com/docker/docker v24.0.2+incompatible
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.0
-	github.com/gorilla/websocket v1.5.0
 )
 
 require (
