@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	"time"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/raojinlin/clogs/docker"
-	"time"
 )
 
 type SSEWriter struct {
@@ -64,6 +65,15 @@ func main() {
 			if err != nil {
 				logsOut.Close()
 			}
+		})
+
+		containerGroup.GET("list", func(c *gin.Context) {
+			containers, err := docker.ListContainers(&types.ContainerListOptions{All: c.Query("all") == "true"})
+			if err != nil {
+				c.AbortWithError(500, err)
+			}
+
+			c.JSON(200, containers)
 		})
 	}
 
