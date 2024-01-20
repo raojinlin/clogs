@@ -3,13 +3,20 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/raojinlin/clogs/docker"
-	"time"
 )
+
+type Container struct {
+	Name    string            `json:"name"`
+	Id      string            `json:"id"`
+	Labels  map[string]string `json:"labels"`
+	Created int64             `json:"created"`
+	Status  string            `json:"status"`
+}
 
 type SSEWriter struct {
 	ctx *gin.Context
@@ -27,6 +34,15 @@ func main() {
 	flag.IntVar(&port, "port", port, "Listen port")
 	flag.Parse()
 	router := gin.Default()
+	router.Use(func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
+		c.Header("Access-Control-Expose-Header", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
+
+		if c.Request.Method == "HEAD" {
+			c.AbortWithStatus(200)
+		}
+	})
 	containerGroup := router.Group("/api/container")
 	{
 		containerGroup.GET("logs/:container", func(c *gin.Context) {
@@ -65,9 +81,43 @@ func main() {
 				logsOut.Close()
 			}
 		})
+
+		containerGroup.GET("list", func(ctx *gin.Context) {
+			cli, err := docker.NewCli()
+			if err != nil {
+				ctx.AbortWithError(500, err)
+				return
+			}
+
+			containers, err := cli.ContainerList(ctx, types.ContainerListOptions{All: true})
+			if err != nil {
+				ctx.AbortWithError(500, err)
+				return
+			}
+
+			var result []Container
+			for _, c := range containers {
+				result = append(result, Container{Name: c.Names[0], Id: c.ID, Created: c.Created, Labels: c.Labels, Status: c.Status})
+			}
+			ctx.JSON(200, result)
+		})
 	}
 
-	router.LoadHTMLGlob("template/*")
+	router.LoadHTMLGlob("build/*.html")
+
+	router.GET("/", func(c *gin.Context) {
+		c.Header("content-type", "text/html")
+		c.HTML(200, "index.html", gin.H{})
+	})
+
+	router.Static("/build", "./build")
+	router.StaticFile("/favicon.ico", "./build/favicon.ico")
+	router.StaticFile("/index.html", "./build/index.html")
+	router.StaticFile("/robot.txt", "./build/robot.txt")
+	router.StaticFile("/manifest.json", "./build/manifest.json")
+	router.StaticFile("/asset-manifest.json", "./build/asset-manifest.json")
+	router.Static("/static", "./build/static")
+
 	router.GET("/logs/:container", func(c *gin.Context) {
 		c.Header("content-type", "text/html")
 		logFile := c.Query("logFile")
@@ -87,14 +137,17 @@ func main() {
 		})
 	})
 
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"PUT", "PATCH", "POST", "GET"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length", "Content-Type"},
-		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
-	}))
+	// router.Use(cors.New(cors.Config{
+	// 	AllowMethods:  []string{"PUT", "PATCH", "POST", "GET"},
+	// 	AllowWildcard: true,
+	// 	AllowHeaders:  []string{"*"},
+	// 	ExposeHeaders: []string{"Content-Length", "Content-Type"},
+	// 	AllowOriginFunc: func(origin string) bool {
+	// 		return true
+	// 	},
+	// 	AllowCredentials: true,
+	// 	MaxAge:           12 * time.Hour,
+	// }))
 
-	router.Run(fmt.Sprintf("0.0.0.0:%d", port))
+	router.Run(fmt.Sprintf(":%d", port))
 }
