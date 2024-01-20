@@ -16,6 +16,7 @@ type Container struct {
 	Labels  map[string]string `json:"labels"`
 	Created int64             `json:"created"`
 	Status  string            `json:"status"`
+	State   string            `json:"state"`
 }
 
 type SSEWriter struct {
@@ -97,7 +98,7 @@ func main() {
 
 			var result []Container
 			for _, c := range containers {
-				result = append(result, Container{Name: c.Names[0], Id: c.ID, Created: c.Created, Labels: c.Labels, Status: c.Status})
+				result = append(result, Container{Name: c.Names[0], Id: c.ID, Created: c.Created, Labels: c.Labels, Status: c.Status, State: c.State})
 			}
 			ctx.JSON(200, result)
 		})

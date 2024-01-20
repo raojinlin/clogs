@@ -9,8 +9,11 @@
   "dependencies": {
     "antd": "^5.13.2",
     "cra-template": "1.2.0",
+    "moment": "^2.30.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router": "^6.21.3",
+    "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
     "web-vitals": "^3.5.1"
   },

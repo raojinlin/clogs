@@ -1,11 +1,10 @@
-import ContainerList from './components/ContainerList/index.tsx';
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import router from './router.ts'
+
 
 function App() {
-  return (
-    <div className="App">
-      <ContainerList />
-    </div>
-  );
+  return <RouterProvider router={router} />
 }
 
 export default App;
