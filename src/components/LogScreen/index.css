@@ -1,0 +1,11 @@
+pre {
+    line-height: 1em;
+    white-space: pre-wrap;
+    background: #2b2b2b;
+    height: 100%;
+}
+
+code.hljs {
+    padding: 0!important;
+    overflow: hidden;
+}

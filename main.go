@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
@@ -36,7 +37,7 @@ func main() {
 	flag.Parse()
 	router := gin.Default()
 	router.Use(func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "http://localhost:3000")
+		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT")
 		c.Header("Access-Control-Expose-Header", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
 
@@ -68,9 +69,10 @@ func main() {
 				ShowStdout: c.Query("showStdout") != "",
 				Follow:     c.Query("follow") != "",
 			}
+			log.Print(logFile, logOptions)
 			logsOut, err := docker.Logs(container, logFile, logOptions)
 			if err != nil {
-				c.AbortWithStatus(500)
+				c.AbortWithError(500, err)
 				return
 			}
 
@@ -98,7 +100,14 @@ func main() {
 
 			var result []Container
 			for _, c := range containers {
-				result = append(result, Container{Name: c.Names[0], Id: c.ID, Created: c.Created, Labels: c.Labels, Status: c.Status, State: c.State})
+				result = append(result, Container{
+					Name:    c.Names[0],
+					Id:      c.ID,
+					Created: c.Created,
+					Labels:  c.Labels,
+					Status:  c.Status,
+					State:   c.State,
+				})
 			}
 			ctx.JSON(200, result)
 		})

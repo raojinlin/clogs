@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { useOutlet } from 'react-router-dom';
-import routes from '../router.ts';
+import './index.css';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -30,7 +23,7 @@ function getItem(
 }
 
 const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined />),
+    getItem('Containers', '1', <span className='material-symbols-rounded'>apartment</span>),
 ];
 
 const App: React.FC = ({ children }) => {
@@ -48,7 +41,7 @@ const App: React.FC = ({ children }) => {
       </Sider>
       <Layout>
         <Header style={{ padding: '0 25px', background: colorBgContainer }}>
-            Container List
+            <span className='material-symbols-rounded title-icon'>apartment</span><strong>Containers</strong>
         </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb style={{ margin: '16px 0' }}>
