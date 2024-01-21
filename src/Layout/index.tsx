@@ -60,7 +60,7 @@ const App: React.FC = ({ children }) => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          Clogs ©{new Date().getFullYear()} Created by <a target='_blank' href='https://github.com/raojinlin/clogs'><GithubOutlined /> raojinlin</a>
+          Clogs ©{new Date().getFullYear()} Created by <a rel="noreferrer" target='_blank' href='https://github.com/raojinlin/clogs'><GithubOutlined /> raojinlin</a>
         </Footer>
       </Layout>
     </Layout>

@@ -29,7 +29,7 @@ export default function LogScreen({ containerID, tail=100, logFile='stdout', sho
         return () => {
             eventSource.close();
         }
-    }, []);
+    }, [containerID, logFile, tail, showStderr, showStdout]);
 
     React.useEffect(() => {
         // if (!ele.current) return;
