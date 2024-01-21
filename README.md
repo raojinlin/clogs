@@ -60,6 +60,12 @@ clogs 提供了以下命令行参数来配置项目：
 go run . -port=8082
 ```
 
+### 访问
+在浏览器打开[http://localhost:8082](http://localhost:8082)即可访问
+
+![./screenhot/webui.log](./screenhost/webui.png)
+![./screenhot/webui-logs.log](./screenhost/webui-logs.png)
+
 ## 接口
 提供两个接口，webui和SSE接口
 

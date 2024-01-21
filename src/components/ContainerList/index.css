@@ -1,0 +1,20 @@
+.container-name {
+    width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: 30px;
+    white-space: nowrap;
+}
+
+.log-screen-modal {
+    width: 90%!important;
+}
+
+.log-screen-modal .ant-modal-body {
+    height: 500px;
+    overflow: auto;
+}
+
+.log-screen-modal code {
+    word-break: break-all;
+}
