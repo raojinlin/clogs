@@ -3,6 +3,7 @@ import type { MenuProps } from 'antd';
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import { useOutlet } from 'react-router-dom';
 import './index.css';
+import { GithubOutlined } from '@ant-design/icons'
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -59,7 +60,7 @@ const App: React.FC = ({ children }) => {
           </div>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
-          Ant Design ©{new Date().getFullYear()} Created by Ant UED
+          Clogs ©{new Date().getFullYear()} Created by <a target='_blank' href='https://github.com/raojinlin/clogs'><GithubOutlined /> raojinlin</a>
         </Footer>
       </Layout>
     </Layout>

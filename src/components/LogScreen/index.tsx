@@ -20,10 +20,6 @@ export default function LogScreen({ containerID, tail=100, logFile='stdout', sho
             setLogs((arr) => {
                 return [...arr, textContent];
             });
-            if (ele.current) {
-                ele.current.scrollTo(0, ele.current.offsetHeight);
-            }
-            hljs.highlightAll();
         };
 
         eventSource.onerror = () => {
@@ -33,6 +29,21 @@ export default function LogScreen({ containerID, tail=100, logFile='stdout', sho
         return () => {
             eventSource.close();
         }
+    }, []);
+
+    React.useEffect(() => {
+        // if (!ele.current) return;
+        //
+        // const observer = new MutationObserver(function (mutations, observer) {
+        //     ele.current.scrollTop = `${ele.current.offsetHeight}px`;
+        //     hljs.highlightAll();
+        // });
+        //
+        // observer.observe(ele.current, {subtree: true, childList: true})
+        //
+        // return () => {
+        //     observer.disconnect();
+        // }
     }, []);
 
     return (

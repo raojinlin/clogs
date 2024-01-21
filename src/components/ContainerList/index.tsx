@@ -80,7 +80,7 @@ export default function ContainerList() {
             {currentContainer ? (
                 <Modal
                     size='big'
-                    title={`${currentContainer.name}的日志`}
+                    title={`${currentContainer.name.replace(/^\//, '')}的日志`}
                     open
                     onCancel={() => setCurrentContainer(null)}
                     className='log-screen-modal'
