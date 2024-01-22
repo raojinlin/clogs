@@ -14,11 +14,13 @@ const statusName = {
 export default function ContainerList() {
     const [containers, setContainers] = React.useState([]);
     const [currentContainer, setCurrentContainer] = React.useState(null);
+    const [loading, setLoading] = React.useState(false);
 
     React.useEffect(() => {
+        setLoading(true);
         getContainers().then((containers) =>
             setContainers(containers)
-        );
+        ).finally(() => setLoading(false));
     }, []);
 
     const columns = [
@@ -76,6 +78,7 @@ export default function ContainerList() {
                 pagination={{total: containers.length, pageSize: 5, showSizeChanger: false}}
                 dataSource={containers}
                 columns={columns}
+                loading={loading}
             />
             {currentContainer ? (
                 <Modal

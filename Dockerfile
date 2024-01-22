@@ -15,7 +15,7 @@ FROM alpine
 
 COPY ./template /code/template
 COPY --from=builder /code/clogs /code/sbin/clogs
-COPY --from=webui-builder /code/build /code
+COPY --from=webui-builder /code/build /code/build
 
 WORKDIR /code
 ENV GIN_MODE=release
