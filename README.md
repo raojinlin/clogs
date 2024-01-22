@@ -14,6 +14,8 @@ clogs (Container Logs) 是一个使用 Go 语言编写的小型开源项目，�
 
 1. 已安装 Go 编程语言环境。
 2. 可以访问 Docker 或已安装 Docker（如果选择使用 Docker 运行）。
+3. 已安装 NodeJS编程语言环境
+
 
 ### 安装步骤
 
@@ -29,12 +31,22 @@ cd clogs
 
 3. 安装依赖：
 ```shell
-go mod tidy
+$ go mod tidy
+$ npm install
+# 安装air工具监听文件变更自动重启go
+$ go get -u github.com/cosmtrek/air
 ```
 
 4. 运行项目
 ```shell
-go run .
+$ npm run dev
+```
+启动后会自动在浏览器打开：http://localhost:3000/
+
+4. 构建项目
+构建后会生成build目录
+```
+$ npm run build
 ```
 
 #### 使用docker
@@ -46,7 +58,7 @@ doker build -t clogs -f ./Dockerfile .
 
 2. 运行镜像
 ```shell
-docker run -d --restart=always --name clogs -it -v /var/run/docker.sock:/var/run/docker.sock clogs
+docker run -d -p 8082:8082 --restart=always --name clogs -it -v /var/run/docker.sock:/var/run/docker.sock clogs
 ```
 
 ### 配置选项

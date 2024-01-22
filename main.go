@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/pkg/stdcopy"
@@ -69,7 +68,6 @@ func main() {
 				ShowStdout: c.Query("showStdout") != "",
 				Follow:     c.Query("follow") != "",
 			}
-			log.Print(logFile, logOptions)
 			logsOut, err := docker.Logs(container, logFile, logOptions)
 			if err != nil {
 				c.AbortWithError(500, err)
