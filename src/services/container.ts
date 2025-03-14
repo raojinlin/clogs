@@ -8,5 +8,5 @@ declare type Containers = {
 
 
 export async function getContainers(): Promise<Containers> {
-    return fetch('http://localhost:8082/api/container/list').then(r => r.json());
+    return fetch('/api/container/list').then(r => r.json());
 }

@@ -7,7 +7,7 @@ export default function LogScreen({ containerID, tail=100, logFile='stdout', sho
     const ele = React.useRef();
 
     React.useEffect(() => {
-        const eventSourceUrl = `http://localhost:8082/api/container/logs/${containerID}?` + querystring.encode({
+        const eventSourceUrl = `/api/container/logs/${containerID}?` + querystring.encode({
             logFile,
             showStdout,
             showStderr,
